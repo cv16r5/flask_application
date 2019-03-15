@@ -3,7 +3,7 @@ from flask import request
 from flask import jsonify
 
 app = Flask(__name__)
-
+app.config['JSON_AS_ASCII'] = False
 
 @app.route('/')
 def hello():
