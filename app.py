@@ -14,7 +14,7 @@ def show_method():
     return request.method
 
 @app.route('/show_data', methods = ['POST'])
-def postJsonHandler():
+def post_json():
     return jsonify(request.json)
     
 
