@@ -8,8 +8,11 @@ app = Flask(__name__)
 def hello():
     return 'Hello, World!'
 
-@app.route('/method', methods=[`GET`, `POST`, `PUT`, `DELETE`])
+@app.route('/method', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def show_method():
     return request.method
+
+if __name__ == '__main__':
+    app.run(debug=True)
 
 
