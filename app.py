@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask import render_template
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -23,6 +24,14 @@ def post_client():
     name =data['name']
     surename=data['surename']
     return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
+
+counter=0
+@app.route('/counter')
+def count_visits():
+    global counter
+    counter += 1
+    return str(counter)
+
 
 
     
