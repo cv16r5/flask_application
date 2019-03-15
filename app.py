@@ -19,7 +19,7 @@ def post_json():
 
 @app.route('/pretty_print_name', methods = ['POST'])
 def post_client():
-    data=request.json.decode('utf-8')
+    data=request.json
     name =data['name']
     surename=data['surename']
     return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
