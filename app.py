@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 
 app = Flask(__name__)
 
@@ -12,7 +13,10 @@ def hello():
 def show_method():
     return request.method
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/show_data', methods = ['POST'])
+def postJsonHandler():
+    return jsonify(request.json)
+    
+
 
 
