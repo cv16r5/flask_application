@@ -16,6 +16,15 @@ def show_method():
 @app.route('/show_data', methods = ['POST'])
 def post_json():
     return jsonify(request.json)
+
+@app.route('/pretty_print_name', methods = ['POST'])
+def post_client():
+    data=request.json.decode('utf-8')
+    name =data['name']
+    surename=data['surename']
+    return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
+
+
     
 
 
