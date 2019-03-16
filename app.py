@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
-from flask import render_template
 from multiprocessing import Value
 
 
@@ -18,12 +17,12 @@ def show_method():
 
 @app.route('/show_data', methods = ['POST'])
 def post_json():
-    return jsonify(request.json)
+    return str(request.json)
 
 @app.route('/pretty_print_name', methods = ['POST'])
 def post_client():
     data=request.json
-    name =data['name']
+    name =data['name'].encode('utf-8')
     surename=data['surename']
     return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
 
