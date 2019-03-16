@@ -2,6 +2,8 @@ from flask import Flask
 from flask import request
 from flask import jsonify
 from flask import render_template
+from multiprocessing import Value
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -25,12 +27,13 @@ def post_client():
     surename=data['surename']
     return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
 
-counter=0
+counter = Value('i', 0)
 @app.route('/counter')
 def count_visits():
-    global counter
-    counter += 1
-    return str(counter)
+    with counter.get_lock():
+        counter.value += 1
+    return str(counter.value)
+
 
 
 
