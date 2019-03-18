@@ -1,9 +1,8 @@
-from flask import Flask
-from flask import request
-from flask import jsonify
-from flask import Response
-from multiprocessing import Value
-import json
+from flask import (Flask,
+                   request,
+                   jsonify
+                   )
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -14,26 +13,25 @@ def hello():
 
 @app.route('/method', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def show_method():
-    return request.method
+    return str(request.method)
 
 @app.route('/show_data', methods = ['POST'])
 def post_json():
-    results=request.json
-    return json.dumps(results)
+    return jsonify(request.json)
 
 @app.route('/pretty_print_name', methods = ['POST'])
 def post_client():
-    data=request.json
-    name =data['name']
-    surename=data['surename']
+    name =request.json.get('name')
+    surename=request.json.get('surename')
     return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
 
-counter = Value('i', 0)
+app.counter=0
+
 @app.route('/counter')
 def count_visits():
-    with counter.get_lock():
-        counter.value += 1
-    return str(counter.value)
+    app.counter+=1
+    return(str(app.counter))
+    
 
 
 
