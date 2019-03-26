@@ -94,7 +94,7 @@ def trains():
         return jsonify(app.trains)
     elif request.method == 'POST':
         train_id = set_train()
-        return redirect(url_for('fish', train_id=train_id, format='json'))
+        return redirect(url_for('train', train_id=train_id, format='json'))
 
 
 @app.route('/trains/<train_id>',methods=['GET', 'DELETE'])
