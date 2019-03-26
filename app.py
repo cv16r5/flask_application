@@ -1,45 +1,114 @@
-from flask import (Flask,
-                   request,
-                   jsonify
-                   )
+from flask import Flask, request, Response, session, redirect, url_for, jsonify,render_template
+from functools import wraps
+import uuid 
+from errors import InvalidUsage
+
 
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
+app.secret_key = 'my super secret key'.encode('utf8') 
+app.trains = {}
 
 @app.route('/')
-def hello():
+def root():
     return 'Hello, World!'
 
-@app.route('/method', methods=['GET', 'POST', 'PUT', 'DELETE'])
-def show_method():
-    return str(request.method)
+def check_auth(username, password):
+    return username == 'TRAIN' and password == 'TuN3L'
 
-@app.route('/show_data', methods = ['POST'])
-def post_json():
-    return jsonify(request.json)
+def please_authenticate():
+    return Response('Not authorized.\n'
+                    'Please try again', 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-@app.route('/pretty_print_name', methods = ['POST'])
-def post_client():
-    name =request.json.get('name')
-    surename=request.json.get('surename')
-    return ('Na imię mu {}, a nazwisko jego {}').format(name,surename)
+def requires_basic_auth(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return please_authenticate()
+        return func(*args, **kwargs)
+    return wrapper
 
-app.counter=0
+@app.route('/login', methods=['GET', 'POST'])
+@requires_basic_auth
+def login():
+    session['username'] = request.authorization.username
+    return redirect(url_for('hello'))
 
-@app.route('/counter')
-def count_visits():
-    app.counter+=1
-    return(str(app.counter))
-    
+def requires_user_session(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not session.get('username'):
+            return redirect(url_for('login'))
+        return func(*args, **kwargs)
+    return wrapper
+
+@app.route('/hello')
+@requires_user_session
+def hello():
+    return render_template('greeting.html', user =session['username'])
+
+@app.route('/logout', methods=['GET', 'POST'])
+@requires_user_session
+def logout():
+    if request.method == 'GET':
+        return redirect(url_for('root'))
+    del session['username']
+    return redirect(url_for('root'))
+
+@app.errorhandler(InvalidUsage)
+def handle_invalid_usage(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+def get_train_from_json():
+    train_data = request.get_json()
+    if not train_data:
+        raise InvalidUsage('Please provide json data')
+    return train_data
 
 
+def set_train(train_id=None, data=None, update=False):
+    if train_id is None:
+        train_id = str(uuid.uuid4())
+
+    if data is None:
+        data = get_train_from_json()
+        if data is None:
+            raise InvalidUsage('Please provide json data')
+
+    if update:
+        app.trains[train_id].update(data)
+    else:
+        app.trains[train_id] = data
+
+    return train_id
 
 
+@app.route('/trains', methods=['GET', 'POST'])
+@requires_user_session
+def trains():
+    if request.method == 'GET':
+        return jsonify(app.trains)
+    elif request.method == 'POST':
+        train_id = set_train()
+        return redirect(url_for('fish', train_id=train_id, format='json'))
 
 
+@app.route('/trains/<train_id>',methods=['GET', 'DELETE'])
+def fish(train_id):
+    if train_id not in app.trains:
+        return 'No such train', 404
 
-    
+    if request.method == 'DELETE':
+        del app.trains[train_id]
+        return '', 204
 
+    if request.method == 'GET' and request.args.get('format') != 'json':
+        raise InvalidUsage("Missing 'format=json' in query string.",
+                            status_code=415)
+    return jsonify(app.trains[train_id])
 
 
