@@ -1,8 +1,6 @@
 from flask import Flask, request, Response, session, redirect, url_for, jsonify,render_template
 from functools import wraps
 import uuid 
-from errors import InvalidUsage
-
 
 
 app = Flask(__name__)
@@ -30,7 +28,7 @@ def requires_basic_auth(func):
         return func(*args, **kwargs)
     return wrapper
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=[ 'POST'])
 @requires_basic_auth
 def login():
     session['username'] = request.authorization.username
@@ -47,7 +45,7 @@ def requires_user_session(func):
 @app.route('/hello')
 @requires_user_session
 def hello():
-    return render_template('greeting.html', name =session['username'])
+    return render_template('greeting.html', user =session['username'])
 
 @app.route('/logout', methods=['GET', 'POST'])
 @requires_user_session
@@ -57,16 +55,11 @@ def logout():
     del session['username']
     return redirect(url_for('root'))
 
-@app.errorhandler(InvalidUsage)
-def handle_invalid_usage(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
-    return response
 
 def get_train_from_json():
     train_data = request.get_json()
     if not train_data:
-        raise InvalidUsage('Please provide json data')
+        raise 'Please provide json data'
     return train_data
 
 
@@ -77,7 +70,7 @@ def set_train(train_id=None, data=None, update=False):
     if data is None:
         data = get_train_from_json()
         if data is None:
-            raise InvalidUsage('Please provide json data')
+            raise ('Please provide json data')
 
     if update:
         app.trains[train_id].update(data)
@@ -107,8 +100,7 @@ def fish(train_id):
         return '', 204
 
     if request.method == 'GET' and request.args.get('format') != 'json':
-        raise InvalidUsage("Missing 'format=json' in query string.",
-                            status_code=415)
+        raise ("Missing 'format=json' in query string.")
     return jsonify(app.trains[train_id])
 
 
