@@ -28,7 +28,7 @@ def requires_basic_auth(func):
         return func(*args, **kwargs)
     return wrapper
 
-@app.route('/login', methods=[ 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 @requires_basic_auth
 def login():
     session['username'] = request.authorization.username
