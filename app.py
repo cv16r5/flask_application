@@ -47,7 +47,7 @@ def requires_user_session(func):
 @app.route('/hello')
 @requires_user_session
 def hello():
-    return render_template('greeting.html', user =session['username'])
+    return render_template('greeting.html', name =session['username'])
 
 @app.route('/logout', methods=['GET', 'POST'])
 @requires_user_session
