@@ -1,6 +1,6 @@
 from flask import Flask, request, Response, session, redirect, url_for, jsonify,render_template
 from functools import wraps
-import uuid 
+from uuid import UUID,uuid4 
 
 
 app = Flask(__name__)
@@ -65,7 +65,7 @@ def get_train_from_json():
 
 def set_train(train_id=None, data=None, update=False):
     if train_id is None:
-        train_id = str(uuid.uuid4())
+        train_id = str(uuid4())
 
     if data is None:
         data = get_train_from_json()
