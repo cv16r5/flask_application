@@ -1,6 +1,6 @@
 from flask import Flask, request, Response, session, redirect, url_for, jsonify,render_template
 from functools import wraps
-from uuid import UUID,uuid4 
+from uuid import uuid4 
 
 
 app = Flask(__name__)
@@ -90,8 +90,8 @@ def trains():
         return redirect(url_for('train', train_id=train_id, format='json'))
 
 
-@app.route('/trains/<train_id>',methods=['GET', 'PUT', 'PATCH',  'DELETE'])
-def fish(train_id):
+@app.route('/trains/<train_id>',methods=['GET', 'DELETE'])
+def train(train_id):
     if train_id not in app.trains:
         return 'No such train', 404
 
@@ -99,11 +99,6 @@ def fish(train_id):
         del app.trains[train_id]
         return '', 204
 
-    if request.method == 'PUT':
-        set_train(train_id)
-    elif request.method == 'PATCH':
-        set_train(train_id, update=True)
-        
     if request.method == 'GET' and request.args.get('format') != 'json':
         raise ("Missing 'format=json' in query string.")
     return jsonify(app.trains[train_id])
