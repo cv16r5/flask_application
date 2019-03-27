@@ -91,6 +91,7 @@ def trains():
 
 
 @app.route('/trains/<train_id>',methods=['GET', 'DELETE'])
+@requires_user_session
 def train(train_id):
     if train_id not in app.trains:
         return 'No such train', 404
