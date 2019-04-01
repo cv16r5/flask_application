@@ -14,8 +14,8 @@ from flask import (Flask,
 
 app = Flask(__name__)
 
-DATABASE = '/home/admin5/python_project/level-up-python/sqlite_source/chinook.db'
-
+#DATABASE = '/home/admin5/python_project/level-up-python/sqlite_source/chinook.db'
+DATABASE='chinook.db'
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
