@@ -81,7 +81,7 @@ def tracks():
         
 
 class TracksRegistrationForm(Form):
-    name_artist=StringField(validators=[validators.optional()])
+    artist=StringField(validators=[validators.optional()])
     per_page=IntegerField(validators=[validators.optional(),validators.number_range(min=1)])
     page=IntegerField(validators=[validators.optional(),validators.number_range(min=1)])
     
@@ -113,7 +113,7 @@ def get_tracks():
     if page==0 and per_page==-1:
         offset=-1
     
-    if form.data['name_artist']:
+    if form.data['artist']:
         
         data = db.execute(
                 '''
@@ -122,7 +122,7 @@ def get_tracks():
                 JOIN artists ON albums.artistid = artists.artistid
                 where artists.name =?
                 order by tracks.name COLLATE NOCASE LIMIT ? OFFSET ?;''',
-                (form.data['name_artist'],limit,offset))
+                (form.data['artist'],limit,offset))
     else:
         data = db.execute(
                 '''SELECT Name FROM tracks ORDER BY Name 
