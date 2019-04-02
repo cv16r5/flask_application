@@ -110,6 +110,8 @@ def get_tracks():
     page=form.data['page'] or 0
     page_index=page-1
     offset=page_index*per_page
+    if page==0 and per_page==-1:
+        offset=-1
     
     if form.data['name_artist']:
         
