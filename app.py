@@ -135,21 +135,30 @@ def post_new_record():
     db = get_db()
 
     new_track = request.get_json()
+    a1=new_track.get('Name')
+    a2=new_track.get('album_id')
+    a3=new_track.get('media_type_id')
+    a4=new_track.get('genre_id')
+    a5=new_track.get('composer')
+    a6=new_track.get('milliseconds')
+    a7=new_track.get('bytes')
+    a8=new_track.get('price')
+#   
 #    return jsonify(new_track)
-    column_name = db.execute(
-                'PRAGMA table_info(tracks);' ).fetchall()
-    for clname in column_name:
-        if new_track.get(clname[1]) and clname[1]!='TrackId'is None:
-             raise InvalidUsage('missing {} in request data').format(clname[0])
+#    column_name = db.execute(
+#                'PRAGMA table_info(tracks);' ).fetchall()
+#    for clname in column_name:
+#        if new_track.get(clname[1]) and clname[1]!='TrackId'is None:
+#             raise InvalidUsage('missing {} in request data').format(clname[0])
  
     try:
+
         db.execute(
             'INSERT INTO tracks '
-            '( Name, AlbumId, MediaTypeId, '
+            '( name, AlbumId, MediaTypeId, '
            ' GenreId, Composer, Milliseconds, Bytes, UnitPrice) '
-            ' VALUES ( :Name, :AlbumId, :MediaTypeId,'
-            ':GenreId, :Composer, :Milliseconds, :Bytes, :UnitPrice);',
-            new_track
+           ' VALUES ("{}", "{}","{}", "{}","{}", "{}","{}", "{}");'
+            .format(a1, a2,a3,a4,a5,a6,a7,a8)
         )
         db.commit()
         
@@ -170,14 +179,14 @@ def post_new_record():
 
     db_track = db.execute(
         'SELECT * FROM tracks '
-        'where tracks.Name=:Name and '
-        'tracks.AlbumId=:AlbumId and  tracks.MediaTypeId=:MediaTypeId and '
-            'tracks.GenreId=:GenreId and tracks.Composer= :Composer and '
-            'tracks.Milliseconds= :Milliseconds and tracks.Bytes= :Bytes '
-            ' and tracks.UnitPrice= :UnitPrice;',
-        new_track
+        'where tracks.Name="{}" and '
+        'tracks.AlbumId="{}" and  tracks.MediaTypeId="{}" and '
+            'tracks.GenreId="{}" and tracks.Composer= "{}" and '
+            'tracks.Milliseconds= "{}" and tracks.Bytes= "{}" '
+            ' and tracks.UnitPrice= "{}";'.format(a1, a2,a3,a4,a5,a6,a7,a8)
+        
     ).fetchone()
-
+#    return 'adsfa'
     return jsonify(dict(db_track))
 
 
