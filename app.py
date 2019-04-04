@@ -135,23 +135,24 @@ def post_new_record():
     db = get_db()
 
     new_track = request.get_json()
+#    return jsonify(new_track)
     column_name = db.execute(
                 'PRAGMA table_info(tracks);' ).fetchall()
     for clname in column_name:
         if new_track.get(clname[1]) and clname[1]!='TrackId'is None:
              raise InvalidUsage('missing {} in request data').format(clname[0])
-   
-    
-    
+ 
     try:
         db.execute(
-            'INSERT INTO tracks ( Name, AlbumId, MediaTypeId, '
+            'INSERT INTO tracks '
+            '( Name, AlbumId, MediaTypeId, '
            ' GenreId, Composer, Milliseconds, Bytes, UnitPrice) '
-            'VALUES ( :Name, :AlbumId, :MediaTypeId,'
-            ':GenreId, :Composer, :Milliseconds, :Bytes, :UnitPrice;',
+            ' VALUES ( :Name, :AlbumId, :MediaTypeId,'
+            ':GenreId, :Composer, :Milliseconds, :Bytes, :UnitPrice);',
             new_track
         )
         db.commit()
+        
     
     except sqlite3.IntegrityError as error:
 
@@ -169,10 +170,10 @@ def post_new_record():
 
     db_track = db.execute(
         'SELECT * FROM tracks '
-        'where tracks.Name=:Name and'
-        'tracks.AlbumId=:AlbumId and  tracks.MediaTypeId=:MediaTypeId and'
+        'where tracks.Name=:Name and '
+        'tracks.AlbumId=:AlbumId and  tracks.MediaTypeId=:MediaTypeId and '
             'tracks.GenreId=:GenreId and tracks.Composer= :Composer and '
-            'tracks.Milliseconds= :Milliseconds and tracks.Bytes= :Bytes'
+            'tracks.Milliseconds= :Milliseconds and tracks.Bytes= :Bytes '
             ' and tracks.UnitPrice= :UnitPrice;',
         new_track
     ).fetchone()
