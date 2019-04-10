@@ -1,6 +1,6 @@
 import os
 
-os.chdir(r'/home/admin5/python_project/level-up-python/')
+#os.chdir(r'/home/admin5/python_project/level-up-python/')
 from flask import Flask, abort, render_template, request,jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -63,6 +63,10 @@ def handle_invalid_usage(error):
 
 
 
+@app.route("/hello")
+def hello():
+    return 'hello'
+
 @app.route("/longest_tracks")
 def longest_tracks():
     try:
@@ -102,7 +106,9 @@ def get_artist():
             return jsonify(result)
     except Exception as e:
         return 405
-    
+ 
+#if __name__ == "__main__":
+#    app.run(debug=False)
 #@app.route("/artists", methods=["GET", "PATCH"])
 #def artists():
 #    if request.method == "GET":
@@ -152,5 +158,4 @@ def get_artist():
 #    return render_template("playlists.html", playlists=playlists)
 
 
-#if __name__ == "__main__":
-#    app.run(debug=False)
+
