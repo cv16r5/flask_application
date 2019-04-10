@@ -81,31 +81,57 @@ def longest_tracks():
 
 class TracksRegistrationForm(Form):
     artist=StringField(validators=[validators.optional()])    
+
+
 @app.route("/longest_tracks_by_artist")
-def get_artist():
-    form=TracksRegistrationForm(request.args)
-    
-    if not form.validate():
-        return jsonify(error=form.error)
-    
-    if  form.data['artist'] is None:
-        return str(404)
-    
-    name_artist=form.data['artist']
-    
+def longest_tracks_by_artist():
+    a = request.args
+    if ('artist' in a):
+        art = a['artist']
+    else:
+        abort(404)
+        #raise InvalidUsage('missing artist')
+        #return 404
+        
     try:
-        tracks = db_session.query(models.Track).filter(models.Track.composer==name_artist).order_by(models.Track.milliseconds.desc()).limit(10).all() 
-        result=[]
+        tracks = db_session.query(models.Track).join(models.Track.album).join(models.Album.artist).filter(models.Artist.name == art).order_by(models.Track.milliseconds.desc()).limit(10).all()
+        result = []
         for j,row in enumerate(tracks):
             list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
             result.append(dict(list_result))
-        if len (result)<1:
+                
+        if len(result) == 0:
             abort(404)
-            return str(404)
-        else:
-            return jsonify(result)
-    except Exception as e:
-        return 405
+
+    except:
+        abort(404)
+
+    return jsonify(result)
+#@app.route("/longest_tracks_by_artist")
+#def get_artist():
+#    form=TracksRegistrationForm(request.args)
+#    
+#    if not form.validate():
+#        return jsonify(error=form.error)
+#    
+#    if  form.data['artist'] is None:
+#        return str(404)
+#    
+#    name_artist=form.data['artist']
+#    
+#    try:
+#        tracks = db_session.query(models.Track).filter(models.Track.composer==name_artist).order_by(models.Track.milliseconds.desc()).limit(10).all() 
+#        result=[]
+#        for j,row in enumerate(tracks):
+#            list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
+#            result.append(dict(list_result))
+#        if len (result)<1:
+#            abort(404)
+#            return str(404)
+#        else:
+#            return jsonify(result)
+#    except Exception as e:
+#        return 405
  
 #if __name__ == "__main__":
 #    app.run(debug=False)
