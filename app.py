@@ -111,7 +111,7 @@ def post_artists():
         new_name = data.get("name")
         if new_name is None:
             abort(400)
-        if isinstance(new_name,str) is False and len(new_name)>200:
+        if isinstance(new_name,str) is False or len(new_name)>200:
             abort(400)
         
         art = models.Artist(name = new_name)
