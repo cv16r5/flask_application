@@ -118,11 +118,9 @@ def post_artists():
     db_session.commit()
     
     row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
-    result = []
     list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
-    result.append(dict(list_result))
 
-    return jsonify(result)
+    return jsonify(dict(list_result))
 
 
 
