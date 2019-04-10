@@ -117,10 +117,15 @@ def post_artists():
     db_session.add(art)
     db_session.commit()
     
-    row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
-    list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
-
-    return jsonify(dict(list_result))
+    try:
+        row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
+        list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
+        result=dict(list_result)
+        if not result:
+            abort(400)
+        return jsonify(result)
+    except:
+        abort(400)
 
 
 
