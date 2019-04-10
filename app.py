@@ -13,10 +13,10 @@ import models
 from models import Base
 
 
-# DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = os.environ['DATABASE_URL']
 
-engine = create_engine("postgresql://postgres:test1234@localhost:5432/chinook")
-# engine = create_engine(DATABASE_URL)
+#engine = create_engine("postgresql://postgres:test1234@localhost:5432/chinook")
+engine = create_engine(DATABASE_URL)
 
 db_session = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
