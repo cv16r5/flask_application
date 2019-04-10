@@ -9,6 +9,8 @@ from wtforms import (Form,
                      validators,
                      IntegerField
                      )
+from cerberus import Validator
+from sqlalchemy import func
 import models
 from models import Base
 
@@ -76,6 +78,7 @@ def longest_tracks_by_artist():
     a = request.args
     if ('artist' in a):
         art = a['artist']
+
     else:
         abort(404)
         
@@ -107,18 +110,22 @@ def post_artists():
     new_name = data.get("name")
     if new_name is None:
         abort(400)
+    if isinstance(new_name,str) is False and len(new_name)>200:
+        abort(400)
         
     art = models.Artist(name = new_name)
     db_session.add(art)
     db_session.commit()
-
-    artist = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
+    
+    row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
     result = []
-    for j,row in enumerate(artist):
-        list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
-        result.append(dict(list_result))
+    list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
+    result.append(dict(list_result))
 
     return jsonify(result)
+
+
+
 
 #@app.route("/longest_tracks_by_artist")
 #def get_artist():
@@ -148,20 +155,7 @@ def post_artists():
  
 #if __name__ == "__main__":
 #    app.run(debug=False)
-#@app.route("/artists", methods=["GET", "PATCH"])
-#def artists():
-#    if request.method == "GET":
-#        return get_artists()
-#    elif request.method == "PATCH":
-#        return patch_artist()
-#    abort(405)
 
-
-#def get_artists():
-#    artists = db_session.query(models.Artist).order_by(models.Artist.name)
-#    return "<br>".join(
-#        f"{idx}. {artist.name}" for idx, artist in enumerate(artists)
-#    )
 
 
 ## Aaron Goldberg , 202
@@ -182,19 +176,8 @@ def post_artists():
 #    db_session.commit()
 #    return "OK"
 
-#
-#@app.route("/albums")
-#def get_albums():
-#    albums = db_session.query(models.Album).order_by(models.Album.title)
-#    return render_template("albums.html", albums=albums)
 
 
-#@app.route("/playlists")
-#def get_playlists():
-#    playlists = db_session.query(models.Playlist).order_by(
-#        models.Playlist.name
-#    )
-#    return render_template("playlists.html", playlists=playlists)
 
 
 
