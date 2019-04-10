@@ -103,7 +103,7 @@ def longest_tracks_by_artist():
 def artists():
     if request.method == "POST":
         return post_artists()
-    abort(405)
+    abort(400)
 
 def post_artists():
     try:
