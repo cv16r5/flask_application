@@ -14,11 +14,9 @@ from sqlalchemy import func
 import models
 from models import Base
 
-
-DATABASE_URL = os.environ['DATABASE_URL']
-
 #engine = create_engine("postgresql://postgres:test1234@localhost:5432/chinook")
-engine = create_engine(DATABASE_URL)
+DATABASE_URL = os.environ['DATABASE_URL']
+#engine = create_engine(DATABASE_URL)
 
 db_session = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -111,7 +109,7 @@ def post_artists():
         new_name = data.get("name")
         if new_name is None:
             abort(400)
-        if isinstance(new_name,str) is False or len(new_name)>200:
+        if isinstance(new_name,str) is False or len(new_name)>200 or len(data)>1:
             abort(400)
         
         art = models.Artist(name = new_name)
@@ -159,7 +157,7 @@ def post_artists():
  
 #if __name__ == "__main__":
 #    app.run(debug=False)
-
+#
 
 
 ## Aaron Goldberg , 202
