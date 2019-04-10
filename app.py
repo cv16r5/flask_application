@@ -80,7 +80,7 @@ def longest_tracks_by_artist():
         art = a['artist']
 
     else:
-        abort(403)
+        abort(404)
         
     try:
         tracks = db_session.query(models.Track).join(models.Track.album).join(models.Album.artist).filter(models.Artist.name == art).order_by(models.Track.milliseconds.desc()).limit(10).all()
@@ -90,10 +90,10 @@ def longest_tracks_by_artist():
             result.append(dict(list_result))
                 
         if len(result) == 0:
-            abort(403)
+            abort(404)
 
     except:
-        abort(403)
+        abort(404)
 
     return jsonify(result)
 
@@ -106,6 +106,7 @@ def artists():
     abort(400)
 
 def post_artists():
+    abort(400)
     data = request.json
     new_name = data.get("name")
     if new_name is None:
@@ -119,6 +120,7 @@ def post_artists():
         row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
         list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
         result=dict(list_result)
+        abort(200)
         return jsonify(result)
     except:
         abort(400)
