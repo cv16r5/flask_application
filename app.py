@@ -53,19 +53,7 @@ def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
-#@app.route("/longest_tracks", methods=["GET", "PATCH"])
-#def artists():
-#    if request.method == "GET":
-#        return get_artists()
-#    elif request.method == "PATCH":
-#        return patch_artist()
-#    abort(405)
 
-
-
-@app.route("/hello")
-def hello():
-    return 'hello'
 
 @app.route("/longest_tracks")
 def longest_tracks():
@@ -90,8 +78,6 @@ def longest_tracks_by_artist():
         art = a['artist']
     else:
         abort(404)
-        #raise InvalidUsage('missing artist')
-        #return 404
         
     try:
         tracks = db_session.query(models.Track).join(models.Track.album).join(models.Album.artist).filter(models.Artist.name == art).order_by(models.Track.milliseconds.desc()).limit(10).all()
@@ -107,6 +93,33 @@ def longest_tracks_by_artist():
         abort(404)
 
     return jsonify(result)
+
+
+
+@app.route("/artists", methods=["POST"])
+def artists():
+    if request.method == "POST":
+        return post_artists()
+    abort(405)
+
+def post_artists():
+    data = request.json
+    new_name = data.get("name")
+    if new_name is None:
+        abort(400)
+        
+    art = models.Artist(name = new_name)
+    db_session.add(art)
+    db_session.commit()
+
+    artist = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
+    result = []
+    for j,row in enumerate(artist):
+        list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
+        result.append(dict(list_result))
+
+    return jsonify(result)
+
 #@app.route("/longest_tracks_by_artist")
 #def get_artist():
 #    form=TracksRegistrationForm(request.args)
