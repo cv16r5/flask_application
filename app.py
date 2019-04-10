@@ -106,18 +106,19 @@ def artists():
     abort(405)
 
 def post_artists():
-    data = request.json
-    new_name = data.get("name")
-    if new_name is None:
-        abort(400)
-    if isinstance(new_name,str) is False and len(new_name)>200:
-        abort(400)
-        
-    art = models.Artist(name = new_name)
-    db_session.add(art)
-    db_session.commit()
-    
     try:
+        data = request.json
+        new_name = data.get("name")
+        if new_name is None:
+            abort(400)
+            if isinstance(new_name,str) is False and len(new_name)>200:
+                abort(400)
+        
+        art = models.Artist(name = new_name)
+        db_session.add(art)
+        db_session.commit()
+    
+    
         row = db_session.query(models.Artist).filter(models.Artist.name == new_name).first()
         list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
         result=dict(list_result)
