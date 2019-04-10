@@ -127,37 +127,39 @@ def post_artists():
         abort(400)
 
 
+@app.route("/count_songs")
+def count_songs():
+    a = request.args
+    if ('artist' in a):
+        art = str(a['artist'])
+        art = art.split(",")
+
+    else:
+        abort(404)
+    try:
+        result_dict = {}
+        songs = (
+            db_session.query(models.Artist.name, func.count(models.Track.name))
+                .join(models.Track.album)
+                .join(models.Album.artist)
+                .filter(models.Artist.name.in_(art))
+                .group_by(models.Artist.name)
+        )
+        if len(songs.all()) == 0:
+            abort(404)
+
+        for u in songs.all():
+            result_dict[u[0]] = u[1]
+
+        return jsonify(result_dict)
+    except:
+        abort(404)
 
 
-#@app.route("/longest_tracks_by_artist")
-#def get_artist():
-#    form=TracksRegistrationForm(request.args)
-#    
-#    if not form.validate():
-#        return jsonify(error=form.error)
-#    
-#    if  form.data['artist'] is None:
-#        return str(404)
-#    
-#    name_artist=form.data['artist']
-#    
-#    try:
-#        tracks = db_session.query(models.Track).filter(models.Track.composer==name_artist).order_by(models.Track.milliseconds.desc()).limit(10).all() 
-#        result=[]
-#        for j,row in enumerate(tracks):
-#            list_result=({c.name: str(getattr(row,c.name)) for c in row.__table__.columns})          
-#            result.append(dict(list_result))
-#        if len (result)<1:
-#            abort(404)
-#            return str(404)
-#        else:
-#            return jsonify(result)
-#    except Exception as e:
-#        return 405
  
 #if __name__ == "__main__":
 #    app.run(debug=False)
-#
+##
 
 
 ## Aaron Goldberg , 202
